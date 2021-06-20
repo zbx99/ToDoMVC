@@ -1,6 +1,11 @@
 html {
-    background-image: url("./resource/background.png");
-    background-size: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("./resource/background.png") no-repeat center;
+    background-size: 100% 100%;
     margin: 0;
     padding: 20px;
     touch-action: manipulation;
