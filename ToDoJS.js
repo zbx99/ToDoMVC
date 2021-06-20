@@ -24,7 +24,7 @@ function update() {
         if (!item.classList.contains(CL_COMPLETED)) leftNum++;
 
         // 设置todayTodos
-        todaytodos.push({
+        todaytodos.unshift({
             message:item.innerText,
             completed:item.classList.contains(CL_COMPLETED),
             date:new Date().toLocaleDateString()
