@@ -7,6 +7,7 @@ var $All = function(sel) {
 var guid = 0;
 var CL_COMPLETED = 'completed';
 var CL_SELECTED = 'selected';
+var CL_FIRST = 'first';
 var DEBUG=true;
 var todaytodos=[];
 
@@ -27,13 +28,15 @@ function update() {
         todaytodos.unshift({
             message:item.innerText,
             completed:item.classList.contains(CL_COMPLETED),
+            first:item.classList.contains(CL_FIRST),
             date:new Date().toLocaleDateString()
         });
 
         // filters
         display = 'none';
         if (filter == 'All'
-            || (filter == 'Active' && !item.classList.contains(CL_COMPLETED))
+            || (filter == 'First' && !item.classList.contains(CL_COMPLETED) && item.classList.contains(CL_FIRST))
+            || (filter == 'Normal'&& !item.classList.contains(CL_COMPLETED) && !item.classList.contains(CL_FIRST))
             || (filter == 'Completed' && item.classList.contains(CL_COMPLETED))
         ) {
             display = 'block';
@@ -47,6 +50,12 @@ function update() {
     let count = $('.todo-count');
     count.innerHTML = (leftNum || 'No') + (leftNum > 1 ? ' items' : ' item') + ' left';
 
+    let toggleAll = $('.toggle-all');
+    if (leftNum > 0) toggleAll.innerText = "Complete All";
+    else {
+        toggleAll.innerText = "Uncomplete All";
+    }
+
     let clearCompleted = $('.clear-completed');
     if (completedNum>0) {
         clearCompleted.style.display="inline";
@@ -56,7 +65,7 @@ function update() {
     }
 }
 
-function addTodo(message,completed) {
+function addTodo(message,completed,first) {
     let todoList = $('.todo-list');
 
     let item = document.createElement('li');
@@ -80,6 +89,9 @@ function addTodo(message,completed) {
 
     todoList.insertBefore(item, todoList.firstChild);
 
+    //设置优先级
+    if (first) item.classList.add(CL_FIRST);
+
     CompleteTodo(id,completed);
 
     update();
@@ -87,8 +99,12 @@ function addTodo(message,completed) {
 
 function CompleteTodo(itemId, completed) {
     let item = $('#' + itemId);
-    if (completed) item.classList.add(CL_COMPLETED);
-    else item.classList.remove(CL_COMPLETED);
+    if (completed) {
+        item.classList.add(CL_COMPLETED);
+    }
+    else {
+        item.classList.remove(CL_COMPLETED);
+    }
     let toggle=item.querySelector('.toggle').checked=completed;
     update();
 }
@@ -108,6 +124,16 @@ function clearCompletedTodoList() {
         if (item.classList.contains(CL_COMPLETED)) {
             todoList.removeChild(item);
         }
+    }
+    update();
+}
+
+function completeAllTodoList(completed) {
+    let todoList=$('.todo-list');
+    let items = todoList.querySelectorAll('li');
+    for (let i=items.length - 1;i>=0;--i) {
+        let item = items[i];
+        CompleteTodo(item.getAttribute("id"),completed);
     }
     update();
 }
@@ -141,36 +167,48 @@ window.onload = function init() {
             console.log("todos[i].date === date.toLocaleDateString()结果是",
             todos[i].date === date.toLocaleDateString());
         if (todos[i].date === date.toLocaleDateString()) {
-            addTodo(todos[i].message,todos[i].completed);
+            addTodo(todos[i].message,todos[i].completed,todos[i].first);
         }
     }
 
     //添加Todos
-    var newTodo = $('.new-todo'); // todo
+    let newTodo = $('.new-todo'); // todo
+    newTodo.addEventListener('touchend', function() {
+        let firstTodo = $('.first-todo');
+        firstTodo.style.display = "inline";
+    });
     newTodo.addEventListener('keyup', function(ev) {
         // Enter
         if (ev.keyCode != 13) return;
 
-        var message = newTodo.value;
+        let message = newTodo.value;
         if (message == '') {
             console.warn('message is empty');
             return;
         }
 
-        addTodo(message);
+        let firstTodo = $('.first-todo');
+        addTodo(message,false,firstTodo.checked);
         newTodo.value = '';
+        firstTodo.style.display = "none";
+        firstTodo.checked = false;
     });
 
-    var clearCompleted = $('.clear-completed');
+    let firstTodo = $('.first-todo');
+    firstTodo.addEventListener('change',function() {
+        newTodo.focus();
+    })
+
+    let clearCompleted = $('.clear-completed');
     clearCompleted.addEventListener('touchend', function() {
         clearCompletedTodoList();
     });
 
-    var filters = $All('.filters li a');
-    for (var i = 0; i < filters.length; ++i) {
+    let filters = $All('.filters li a');
+    for (let i = 0; i < filters.length; ++i) {
         (function(filter) {
             filter.addEventListener('touchend', function() {
-                for (var j = 0; j < filters.length; ++j) {
+                for (let j = 0; j < filters.length; ++j) {
                     filters[j].classList.remove(CL_SELECTED);
                 }
                 filter.classList.add(CL_SELECTED);
@@ -178,6 +216,13 @@ window.onload = function init() {
             });
         })(filters[i])
     }
+
+    let toggleAll = $('.toggle-all');
+    toggleAll.addEventListener('touchend', function() {
+        if (DEBUG) console.log(this.innerText);
+        if (this.innerText === "Uncomplete All") completeAllTodoList(false);
+        else completeAllTodoList(true);
+    });
 
     update();
 };

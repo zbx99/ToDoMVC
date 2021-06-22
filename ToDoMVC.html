@@ -13,7 +13,10 @@
         <h2 id="month">APR</h2>
         <h1 id="todo">Todos</h1>
         <!-- Add New Item -->
-        <input class="new-todo" type="text" placeholder="What needs to be done?" autofocus>
+        <div>
+            <input class="new-todo" type="text" placeholder="What needs to be done?">
+            <input class="first-todo" type="checkbox">
+        </div>
     </header>
 
     <section class="main">
@@ -22,9 +25,11 @@
 
         <footer class="footer">
             <span class="todo-count"></span>
+            <span class="toggle-all">Complete All</span>
             <ul class="filters">
                 <li><a class="selected">All</a></li>
-                <li><a class="">Active</a></li>
+                <li><a class="">First</a></li>
+                <li><a class="">Normal</a></li>
                 <li><a class="">Completed</a></li>
             </ul>
             <button class="clear-completed">Clear completed</button>
