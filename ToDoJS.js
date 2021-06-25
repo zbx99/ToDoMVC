@@ -74,6 +74,7 @@ function addTodo(message,completed,first) {
     item.innerHTML = [
         '<div class="view">',
         '  <input class="toggle" type="checkbox">',
+        '  <input class="todo-input" type="text" readonly="readonly">',
         '  <label class="todo-label">' + message + '</label>',
         '  <button class="destroy"></button>',
         '</div>'
@@ -93,6 +94,51 @@ function addTodo(message,completed,first) {
     if (first) item.classList.add(CL_FIRST);
 
     CompleteTodo(id,completed);
+
+    item.querySelector('.todo-label').addEventListener("touchstart", function (e) {
+        console.log('touchstart');
+        timer = setTimeout(function () {
+            console.log('LongPress');
+            e.preventDefault();
+            // LongPress(parentObj);
+        }, 800);
+    });
+    item.querySelector('.todo-label').addEventListener("touchmove", function (e) {
+        console.log('touchmove');
+        clearTimeout(timer);
+        timer = 0;
+    });
+    item.querySelector('.todo-label').addEventListener("touchend", function (e) {
+        console.log('touchend');
+        clearTimeout(timer);
+        //if (timer != 0) {
+        //    alert('这是点击，不是长按');
+        //}
+        // 长按编辑项目内容
+        let input=item.querySelector('.todo-input');
+        input.style.display="block";
+        input.readOnly=false;
+        let label=item.querySelector('.todo-label');
+        label.style.display="none";
+        let destroy=item.querySelector('.destroy');
+        destroy.style.display="none";
+        input.value=label.innerText;
+        input.addEventListener("keyup",function(ev) {
+            console.log("input");
+            if (ev.keyCode != 13) return;
+            let message = input.value;
+            if (message == '') {
+                console.warn('message is empty');
+                return;
+            }
+            label.innerText=message;
+            input.style.display="none";
+            label.style.display="block";
+            destroy.style.display="block";
+            update();
+        });
+        return false;
+    });
 
     update();
 }
