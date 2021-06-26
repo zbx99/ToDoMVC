@@ -100,7 +100,6 @@ function addTodo(message,completed,first) {
         timer = setTimeout(function () {
             console.log('LongPress');
             e.preventDefault();
-            // LongPress(parentObj);
         }, 800);
     });
     item.querySelector('.todo-label').addEventListener("touchmove", function (e) {
@@ -111,9 +110,6 @@ function addTodo(message,completed,first) {
     item.querySelector('.todo-label').addEventListener("touchend", function (e) {
         console.log('touchend');
         clearTimeout(timer);
-        //if (timer != 0) {
-        //    alert('这是点击，不是长按');
-        //}
         // 长按编辑项目内容
         let input=item.querySelector('.todo-input');
         input.style.display="block";
@@ -137,6 +133,8 @@ function addTodo(message,completed,first) {
             destroy.style.display="block";
             update();
         });
+        
+        e.preventDefault();
         return false;
     });
 
